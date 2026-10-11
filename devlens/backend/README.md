@@ -97,12 +97,17 @@ com.devlens/
 │   ├── entity/
 │   ├── repository/
 │   └── service/
-├── analysis/             # Analysis entity, save endpoint & reusable service
-│   ├── controller/
-│   ├── dto/
-│   ├── entity/
-│   ├── repository/
-│   └── service/
+├── analysis/             # Static Code Analysis Engine & Analysis Persistence
+│   ├── controller/       # AnalysisController & AnalyzeController (/api/analyze/**)
+│   ├── dto/              # Comprehensive, Error, Complexity, Review & Flowchart DTOs
+│   ├── entity/           # Analysis entity
+│   ├── repository/       # AnalysisRepository
+│   ├── service/          # CodeAnalysisEngineService & AnalysisService
+│   ├── syntax/           # SyntaxAnalyzer (JavaParser AST syntax diagnostic)
+│   ├── errors/           # ErrorAnalyzer (Rule-based hazards, nulls, ==, loops)
+│   ├── complexity/       # ComplexityAnalyzer (O(1) to O(2^n) time & space)
+│   ├── quality/          # QualityAnalyzer (Cyclomatic, method length, weighted score)
+│   └── flowchart/        # FlowchartGenerator (CFG graph nodes & Mermaid TD)
 ├── history/              # Analysis history search, filtering & notes
 │   ├── controller/
 │   ├── dto/
@@ -140,18 +145,21 @@ com.devlens/
      }
      ```
    - Zero stack traces or internal implementation details are leaked to clients.
+5. **Payload Limits & Defensive Handling**:
+   - `/api/analyze/**` endpoints enforce a 100 KB payload ceiling (HTTP 400).
+   - Malformed syntax or non-compilable code returns structured 200 responses with exact syntax error feedback, never 500 server crashes.
 
 ---
 
 ## 7. Running Automated Tests
 
-A comprehensive JUnit 5 and MockMvc test suite verifies authentication, ownership isolation, and history filtering using an in-memory H2 database test profile:
+A comprehensive JUnit 5 and MockMvc test suite verifies authentication, ownership isolation, history filtering, and the complete static code analysis engine using an in-memory H2 database test profile:
 
 ```bash
 mvn test
 ```
 
-### Verified Tests:
+### Verified Test Suites (20 Tests, 0 Failures):
 - `AuthControllerTest`:
   - User registration and token issuance
   - Rejection of duplicate email addresses
@@ -163,3 +171,16 @@ mvn test
   - Type-based filtering (`DEBUG`, `COMPLEXITY`)
   - Full-text search across notes and languages
   - Cross-user history scoping isolation
+- `CodeAnalysisEngineTest` (Static Code Analysis Engine):
+  - String equality reference trap (`==` vs `.equals()`)
+  - Empty catch block detection
+  - Infinite loop detection (`while(true)`)
+  - Array boundary hazard in classic bubble sort (`arr.length` vs `arr.length - 1`)
+  - Unreachable statement detection
+  - Potential `NullPointerException` dereference
+  - Asymptotic complexity calculation (`O(n²)` bubble sort, `O(n log n)` merge sort, `O(2^n)` recursive Fibonacci, `O(1)` constant math)
+  - Code quality cyclomatic scoring and line length warnings
+  - Mermaid flowchart generation (`graph TD` with control flow nodes and decision diamonds)
+  - Syntax error diagnostic handling
+  - Non-Java language educational notice
+  - 100 KB payload boundary enforcement

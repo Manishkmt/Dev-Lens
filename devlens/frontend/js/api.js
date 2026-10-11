@@ -27,8 +27,8 @@ export const MOCK_CONFIG = {
   dashboard: false,     // Module 2: Live Spring Boot REST API
   history: false,       // Module 2: Live Spring Boot REST API
   analysesSave: false,  // Module 2: Live Spring Boot REST API
-  analyze: true,        // Module 3: Code Analysis Engine (Mock until Module 3)
-  ai: true,             // Module 3: AI Assistant & Viva (Mock until Module 3)
+  analyze: false,       // Module 3: Live Code Analysis Engine!
+  ai: true,             // Module 3: AI Assistant & Viva (Mock until Module 4)
   reports: true,        // Module 4: PDF & Reports (Mock until Module 4)
   notifications: true   // Module 4: Notifications (Mock until Module 4)
 };

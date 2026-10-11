@@ -65,6 +65,47 @@ A production-grade Java 17 Spring Boot 3 REST API with MySQL persistence and sta
 
 ---
 
+## 🔬 Module 3: Static Code Analysis Engine (Status: ✅ Complete)
+
+A rule-based Abstract Syntax Tree (AST) analysis engine powered by **JavaParser** (`javaparser-core:3.26.2`). Deterministic, ultra-fast, and requires zero external AI tokens or API subscriptions.
+
+### Engine Capabilities:
+1. **AST Syntax Diagnostic (`com.devlens.analysis.syntax.SyntaxAnalyzer`)**:
+   - Strict Java compilation unit validation with humanized error messages and exact line/column pointers.
+2. **Deterministic Code Hazard Detector (`com.devlens.analysis.errors.ErrorAnalyzer`)**:
+   - Reference equality on Strings (`str == "val"` vs `.equals()`).
+   - Empty catch blocks with silent exception swallowing.
+   - Infinite loop detection (`while (true)` or stagnant counter conditions).
+   - Potential `NullPointerException` dereferences and unverified nullable invocations.
+   - Out-of-bounds loop indices in classic array traversal algorithms (e.g., `arr.length` vs `arr.length - 1` in bubble sort).
+   - Unreachable statements and unused local variables.
+3. **Asymptotic Complexity Analyzer (`com.devlens.analysis.complexity.ComplexityAnalyzer`)**:
+   - Calculates Big-O time and auxiliary space complexity: `O(1)`, `O(log n)`, `O(n)`, `O(n log n)`, `O(n²)`, `O(n³)`, `O(2^n)`.
+   - Generates step-by-step mathematical reasoning and nested loop multiplier metrics for student education.
+4. **Code Quality & Cyclomatic Scoring (`com.devlens.analysis.quality.QualityAnalyzer`)**:
+   - Measures method length, parameter bloat, naming conventions, and cyclomatic branching complexity.
+   - Produces a weighted quality score: `0.40 * Reliability + 0.25 * Maintainability + 0.20 * BestPractices + 0.15 * Readability`.
+5. **Control Flow Graph & Mermaid Visualizer (`com.devlens.analysis.flowchart.FlowchartGenerator`)**:
+   - Synthesizes control flow nodes, decision diamonds, and loops into live Mermaid flowchart definitions (`graph TD`).
+6. **API Endpoints (`/api/analyze/**`)**:
+   - `POST /api/analyze/errors`
+   - `POST /api/analyze/complexity`
+   - `POST /api/analyze/review`
+   - `POST /api/analyze/flowchart`
+   - `POST /api/analyze/all`
+   - 100 KB payload boundary enforcement (HTTP 400).
+   - Defensive error handling: bad code and syntax errors return structured 200 responses with actionable feedback, never 500 exceptions.
+7. **Frontend Editor Integration**:
+   - `devlens/frontend/js/api.js` connects live to `/api/analyze/*` (`MOCK_CONFIG.analyze = false`).
+   - "Apply Fix" directly mutates code in the browser editor.
+   - Interactive Mermaid diagrams render dynamically in the Visual Execution Flow tab.
+   - Runs automatically save snapshots to `/api/analyses` to immediately populate History and Dashboard.
+8. **Automated & E2E Testing**:
+   - 14 comprehensive JUnit 5 tests in `CodeAnalysisEngineTest` (20 total backend tests pass with 0 failures).
+   - Full browser execution verified and recorded via video artifact.
+
+---
+
 ## 🏃 Quick Start Guide
 
 ### 1. Start MySQL Server

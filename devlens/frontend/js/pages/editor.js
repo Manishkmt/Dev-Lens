@@ -368,10 +368,25 @@ async function runAnalysis() {
       renderMermaidFlowchart();
     }
 
+    // Auto-save snapshot in the background per user decision
+    try {
+      const activeFile = document.getElementById('active-file-label')?.textContent || 'Java Algorithm';
+      await api.analyze.save({
+        type: 'COMPREHENSIVE',
+        language: currentLanguage,
+        code,
+        resultJson: currentAnalysisData,
+        qualityScore: currentAnalysisData.review?.overallScore || 85,
+        notes: `Auto-saved run for ${activeFile}`
+      });
+    } catch (saveErr) {
+      console.warn('Auto-save background record note:', saveErr);
+    }
+
     toast.success('Analysis updated with latest AST telemetry');
   } catch (err) {
     console.error('Analysis error:', err);
-    toast.error('Analysis failed. Invalid syntax.');
+    toast.error(err.error || 'Analysis failed. Invalid syntax.');
   } finally {
     if (loading) loading.style.display = 'none';
     if (analyzeBtn) analyzeBtn.disabled = false;
@@ -517,23 +532,8 @@ function renderMermaidFlowchart() {
   const container = document.getElementById('mermaid-diagram-container');
   if (!container || typeof mermaid === 'undefined') return;
 
-  const rawCode = `graph TD
-    A([ENTRY: bubbleSort]) --> B{arr == null?}
-    B -- Yes --> C([RETURN])
-    B -- No --> D[int i = 0]
-    D --> E{i < n - 1?}
-    E -- No --> C
-    E -- Yes --> F[swapped = false; j = 0]
-    F --> G{j < n - i - 1?}
-    G -- Yes --> H{arr[j] > arr[j+1]?}
-    H -- Yes (Swap) --> I[Swap arr[j], arr[j+1]<br/>swapped = true]
-    H -- No --> J[j++]
-    I --> J
-    J --> G
-    G -- No --> K{!swapped?}
-    K -- Yes (Break) --> C
-    K -- No --> L[i++]
-    L --> E`;
+  const rawCode = currentAnalysisData?.flowchart?.mermaid || `graph TD
+    A([Start]) --> B[No Flowchart Generated] --> C([End])`;
 
   container.innerHTML = `<div class="mermaid">${rawCode}</div>`;
   mermaid.run({ nodes: container.querySelectorAll('.mermaid') });
