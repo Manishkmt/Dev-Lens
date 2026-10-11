@@ -10,8 +10,11 @@ import { toast } from '../toast.js';
 let isRegisterMode = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // If already authenticated, redirect to dashboard
-  if (auth.isAuthenticated()) {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('logout') === 'true') {
+    auth.clearSession();
+  } else if (auth.isAuthenticated()) {
+    // If already authenticated, redirect to dashboard
     window.location.replace('dashboard.html');
     return;
   }
@@ -25,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('auth-form');
 
   // Check URL query param for ?mode=register
-  const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('mode') === 'register') {
     setMode(true);
   }

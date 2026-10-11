@@ -1,6 +1,6 @@
 /**
  * DevLens Central API Gateway
- * Controls mock vs live backend routing via USE_MOCK flag
+ * Controls mock vs live backend routing via granular per-module MOCK_CONFIG flags
  */
 
 import * as authMock from './mock/authMock.js';
@@ -14,8 +14,27 @@ import * as aiMock from './mock/aiMock.js';
 import * as reportsMock from './mock/reportsMock.js';
 import * as notificationsMock from './mock/notificationsMock.js';
 
-// Global flag - set to false when connecting to Spring Boot backend
-export const USE_MOCK = true;
+/**
+ * Granular Mock Configuration
+ * Module 2 endpoints are wired directly to the live Spring Boot backend (port 8080).
+ * Modules 3 and 4 remain routed to mock data until their respective phases.
+ */
+export const MOCK_CONFIG = {
+  auth: false,          // Module 2: Live Spring Boot REST API
+  users: false,         // Module 2: Live Spring Boot REST API
+  projects: false,      // Module 2: Live Spring Boot REST API
+  files: false,         // Module 2: Live Spring Boot REST API
+  dashboard: false,     // Module 2: Live Spring Boot REST API
+  history: false,       // Module 2: Live Spring Boot REST API
+  analysesSave: false,  // Module 2: Live Spring Boot REST API
+  analyze: true,        // Module 3: Code Analysis Engine (Mock until Module 3)
+  ai: true,             // Module 3: AI Assistant & Viva (Mock until Module 3)
+  reports: true,        // Module 4: PDF & Reports (Mock until Module 4)
+  notifications: true   // Module 4: Notifications (Mock until Module 4)
+};
+
+// Global fallback flag for backward compatibility
+export const USE_MOCK = false;
 export const API_BASE_URL = "http://localhost:8080";
 
 // Helper for simulated network delay in mock mode
@@ -47,6 +66,18 @@ async function request(endpoint, options = {}) {
     } catch (e) {
       errorData = { status: response.status, error: response.statusText };
     }
+
+    // Auto-clear stale or invalid JWT tokens and route to login
+    if (response.status === 401 && !endpoint.startsWith('/api/auth/')) {
+      localStorage.removeItem('devlens_token');
+      localStorage.removeItem('devlens_user');
+      const isPagesDir = window.location.pathname.includes('/pages/');
+      const loginUrl = isPagesDir ? 'login.html' : 'pages/login.html';
+      if (!window.location.pathname.endsWith('login.html')) {
+        window.location.href = loginUrl;
+      }
+    }
+
     throw errorData;
   }
 
@@ -58,7 +89,7 @@ export const api = {
   // Authentication
   auth: {
     login: async (email, password) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.auth) {
         await delay();
         return authMock.mockLogin(email, password);
       }
@@ -69,7 +100,7 @@ export const api = {
     },
 
     register: async (name, email, password) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.auth) {
         await delay();
         return authMock.mockRegister(name, email, password);
       }
@@ -83,7 +114,7 @@ export const api = {
   // User Profile
   users: {
     getMe: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.users) {
         await delay(200);
         return usersMock.mockGetMe();
       }
@@ -91,7 +122,7 @@ export const api = {
     },
 
     updateMe: async (data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.users) {
         await delay(300);
         return usersMock.mockUpdateMe(data);
       }
@@ -102,7 +133,7 @@ export const api = {
     },
 
     changePassword: async (data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.users) {
         await delay(400);
         return usersMock.mockChangePassword(data);
       }
@@ -116,7 +147,7 @@ export const api = {
   // Projects
   projects: {
     getAll: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.projects) {
         await delay(250);
         return projectsMock.mockGetProjects();
       }
@@ -124,7 +155,7 @@ export const api = {
     },
 
     getById: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.projects) {
         await delay(250);
         return projectsMock.mockGetProject(id);
       }
@@ -132,7 +163,7 @@ export const api = {
     },
 
     create: async (data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.projects) {
         await delay(350);
         return projectsMock.mockCreateProject(data);
       }
@@ -143,7 +174,7 @@ export const api = {
     },
 
     update: async (id, data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.projects) {
         await delay(300);
         return projectsMock.mockUpdateProject(id, data);
       }
@@ -154,7 +185,7 @@ export const api = {
     },
 
     delete: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.projects) {
         await delay(300);
         return projectsMock.mockDeleteProject(id);
       }
@@ -167,7 +198,7 @@ export const api = {
   // Project Files
   files: {
     getByProject: async (projectId) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.files) {
         await delay(250);
         return filesMock.mockGetProjectFiles(projectId);
       }
@@ -175,7 +206,7 @@ export const api = {
     },
 
     getById: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.files) {
         await delay(250);
         return filesMock.mockGetFile(id);
       }
@@ -183,7 +214,7 @@ export const api = {
     },
 
     add: async (projectId, data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.files) {
         await delay(350);
         return filesMock.mockAddFile(projectId, data);
       }
@@ -194,7 +225,7 @@ export const api = {
     },
 
     update: async (id, data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.files) {
         await delay(300);
         return filesMock.mockUpdateFile(id, data);
       }
@@ -205,7 +236,7 @@ export const api = {
     },
 
     delete: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.files) {
         await delay(300);
         return filesMock.mockDeleteFile(id);
       }
@@ -218,7 +249,7 @@ export const api = {
   // Dashboard
   dashboard: {
     getStats: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.dashboard) {
         await delay(200);
         return dashboardMock.mockGetStats();
       }
@@ -226,7 +257,7 @@ export const api = {
     },
 
     getChartData: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.dashboard) {
         await delay(250);
         return dashboardMock.mockGetChartData();
       }
@@ -237,7 +268,7 @@ export const api = {
   // Code Analysis Engine
   analyze: {
     errors: async ({ language, code, level }) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.analyze) {
         await delay(500);
         return analysesMock.mockAnalyzeErrors(language, code, level);
       }
@@ -248,7 +279,7 @@ export const api = {
     },
 
     complexity: async ({ language, code, level }) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.analyze) {
         await delay(500);
         return analysesMock.mockAnalyzeComplexity(language, code, level);
       }
@@ -259,7 +290,7 @@ export const api = {
     },
 
     review: async ({ language, code, level }) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.analyze) {
         await delay(500);
         return analysesMock.mockAnalyzeReview(language, code, level);
       }
@@ -270,7 +301,7 @@ export const api = {
     },
 
     flowchart: async ({ language, code, level }) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.analyze) {
         await delay(500);
         return analysesMock.mockAnalyzeFlowchart(language, code, level);
       }
@@ -281,7 +312,7 @@ export const api = {
     },
 
     all: async ({ language, code, level }) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.analyze) {
         await delay(600);
         return analysesMock.mockAnalyzeAll(language, code, level);
       }
@@ -292,7 +323,7 @@ export const api = {
     },
 
     save: async (data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.analysesSave) {
         await delay(350);
         return analysesMock.mockSaveAnalysis(data);
       }
@@ -306,16 +337,24 @@ export const api = {
   // History
   history: {
     getAll: async (params = {}) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.history) {
         await delay(300);
         return historyMock.mockGetHistory(params);
       }
-      const query = new URLSearchParams(params).toString();
-      return request(`/api/history?${query}`);
+      // Strip empty or null keys from params
+      const cleanParams = {};
+      Object.keys(params).forEach(k => {
+        if (params[k] !== undefined && params[k] !== null && params[k] !== '') {
+          cleanParams[k] = params[k];
+        }
+      });
+      const query = new URLSearchParams(cleanParams).toString();
+      const endpoint = query ? `/api/history?${query}` : '/api/history';
+      return request(endpoint);
     },
 
     getById: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.history) {
         await delay(250);
         return historyMock.mockGetHistoryDetail(id);
       }
@@ -323,7 +362,7 @@ export const api = {
     },
 
     updateNotes: async (id, notes) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.history) {
         await delay(300);
         return historyMock.mockUpdateNotes(id, notes);
       }
@@ -334,7 +373,7 @@ export const api = {
     },
 
     delete: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.history) {
         await delay(300);
         return historyMock.mockDeleteHistory(id);
       }
@@ -344,10 +383,10 @@ export const api = {
     }
   },
 
-  // AI & Learning
+  // AI & Learning (Module 3)
   ai: {
     chat: async (payload) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.ai) {
         await delay(450);
         return aiMock.mockAiChat(payload);
       }
@@ -358,7 +397,7 @@ export const api = {
     },
 
     getChatSessions: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.ai) {
         await delay(200);
         return aiMock.mockGetChatSessions();
       }
@@ -366,7 +405,7 @@ export const api = {
     },
 
     getChatSessionDetail: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.ai) {
         await delay(250);
         return aiMock.mockGetChatSessionDetail(id);
       }
@@ -374,7 +413,7 @@ export const api = {
     },
 
     learning: async (payload) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.ai) {
         await delay(350);
         return aiMock.mockAiLearning(payload);
       }
@@ -385,7 +424,7 @@ export const api = {
     },
 
     compare: async (payload) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.ai) {
         await delay(500);
         return aiMock.mockAiCompare(payload);
       }
@@ -396,10 +435,10 @@ export const api = {
     }
   },
 
-  // Reports
+  // Reports (Module 4)
   reports: {
     getAll: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.reports) {
         await delay(250);
         return reportsMock.mockGetReports();
       }
@@ -407,7 +446,7 @@ export const api = {
     },
 
     getById: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.reports) {
         await delay(250);
         return reportsMock.mockGetReportDetail(id);
       }
@@ -415,7 +454,7 @@ export const api = {
     },
 
     create: async (data) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.reports) {
         await delay(350);
         return reportsMock.mockCreateReport(data);
       }
@@ -426,10 +465,10 @@ export const api = {
     }
   },
 
-  // Notifications
+  // Notifications (Module 4)
   notifications: {
     getAll: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.notifications) {
         await delay(150);
         return notificationsMock.mockGetNotifications();
       }
@@ -437,7 +476,7 @@ export const api = {
     },
 
     markRead: async (id) => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.notifications) {
         return notificationsMock.mockMarkNotificationRead(id);
       }
       return request(`/api/notifications/${id}/read`, {
@@ -446,7 +485,7 @@ export const api = {
     },
 
     markAllRead: async () => {
-      if (USE_MOCK) {
+      if (MOCK_CONFIG.notifications) {
         return notificationsMock.mockMarkAllNotificationsRead();
       }
       return request('/api/notifications/read-all', {

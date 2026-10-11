@@ -1,0 +1,165 @@
+# DevLens Backend
+
+DevLens REST API backend built with **Java 17**, **Spring Boot 3.x**, and **Maven**.  
+Provides secure JWT authentication, strict user data isolation, code repository management, and code analysis persistence for programming students.
+
+---
+
+## 1. Prerequisites
+
+- **Java Development Kit (JDK)**: Java 17 or higher (JDK 21 LTS supported).
+- **Apache Maven**: 3.8+ (or use `./mvnw`).
+- **MySQL Server**: 8.0+ running on port `3306`.
+
+---
+
+## 2. MySQL Installation & Configuration
+
+### Option A: Local MySQL Community Server (Windows)
+1. Download and install **MySQL Community Server 8.0+** from [dev.mysql.com](https://dev.mysql.com/downloads/installer/).
+2. During installation, set root user password to `123456`.
+3. Start the MySQL service:
+   ```powershell
+   net start MySQL
+   ```
+4. Verify port `3306` is accessible:
+   ```powershell
+   Test-NetConnection -ComputerName localhost -Port 3306
+   ```
+
+### Option B: Docker Container
+Alternatively, spin up MySQL 8 in Docker with a single command:
+```bash
+docker run --name devlens-mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_DATABASE=devlens -d mysql:8.0
+```
+
+### Application Database Properties
+The backend automatically creates the `devlens` database and manages table creation:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/devlens?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=123456
+spring.jpa.hibernate.ddl-auto=update
+server.port=8080
+```
+
+---
+
+## 3. Running the Backend
+
+### Run via Maven
+From the `devlens/backend` directory:
+```bash
+mvn spring-boot:run
+```
+
+Or using the Maven wrapper:
+```bash
+./mvnw spring-boot:run
+```
+
+The server starts on **http://localhost:8080**.
+
+---
+
+## 4. Default Demo Account
+
+When the database is empty on first startup, a `CommandLineRunner` (`DemoDataSeeder`) automatically seeds a demo student account:
+
+- **Email**: `demo@devlens.com`
+- **Password**: `demo123`
+- **Role**: `USER`
+- **Pre-loaded Projects**:
+  - `CS201: Data Structures & Algorithms` (with `BubbleSort.java` and `QuickSort.java`)
+  - `Distributed Task Scheduler` (with `TaskWorker.java`)
+- **Pre-loaded Analyses**: Comprehensive, Complexity Audit, and Code Review records.
+
+---
+
+## 5. Architecture & Package Structure
+
+Base package: `com.devlens`
+```
+com.devlens/
+├── auth/                 # Authentication (Register, Login, JWT tokens)
+│   ├── controller/
+│   ├── dto/
+│   └── service/
+├── user/                 # User entity & profile management
+│   ├── controller/
+│   ├── dto/
+│   ├── entity/
+│   ├── repository/
+│   └── service/
+├── project/              # Project & SourceFile repositories & controllers
+│   ├── controller/
+│   ├── dto/
+│   ├── entity/
+│   ├── repository/
+│   └── service/
+├── analysis/             # Analysis entity, save endpoint & reusable service
+│   ├── controller/
+│   ├── dto/
+│   ├── entity/
+│   ├── repository/
+│   └── service/
+├── history/              # Analysis history search, filtering & notes
+│   ├── controller/
+│   ├── dto/
+│   └── service/
+├── dashboard/            # Aggregate stats & activity timeline charts
+│   ├── controller/
+│   ├── dto/
+│   └── service/
+└── common/               # Shared cross-cutting concerns
+    ├── config/           # SecurityConfig, JwtTokenProvider, DataSeeder
+    ├── dto/              # ErrorResponse, ApiResponse
+    └── exception/        # GlobalExceptionHandler (@ControllerAdvice)
+```
+
+---
+
+## 6. Security & Data Isolation Guarantees
+
+1. **Stateless JWT Security**: Pass the bearer token in every request:
+   `Authorization: Bearer <jwt-token>`
+2. **Public Endpoints**: Only `/api/auth/**` and CORS `OPTIONS` requests are public.
+3. **Owner Scoping**:
+   - Every SQL query is parameterized by the authenticated user's ID (`@AuthenticationPrincipal UserPrincipal principal`).
+   - User A cannot view, edit, or delete User B's projects, files, or analyses.
+   - Cross-user queries return `404 Not Found` to prevent resource enumeration.
+4. **Global Exception Handling**:
+   - Validation failures return structured JSON:
+     ```json
+     {
+       "status": 400,
+       "error": "Validation failed",
+       "fields": {
+         "email": "Email must be a valid email address"
+       }
+     }
+     ```
+   - Zero stack traces or internal implementation details are leaked to clients.
+
+---
+
+## 7. Running Automated Tests
+
+A comprehensive JUnit 5 and MockMvc test suite verifies authentication, ownership isolation, and history filtering using an in-memory H2 database test profile:
+
+```bash
+mvn test
+```
+
+### Verified Tests:
+- `AuthControllerTest`:
+  - User registration and token issuance
+  - Rejection of duplicate email addresses
+  - Successful login with credentials
+  - Rejection of invalid passwords (401)
+- `ProjectOwnershipTest`:
+  - Multi-tenant data isolation: User B receives 404 attempting to read or delete User A's project
+- `HistoryFilterTest`:
+  - Type-based filtering (`DEBUG`, `COMPLEXITY`)
+  - Full-text search across notes and languages
+  - Cross-user history scoping isolation

@@ -16,13 +16,13 @@
 ```
 devlens/
 ├── frontend/   # Plain HTML5, CSS3 (60-30-10 Design Tokens), Vanilla JavaScript (ES Modules)
-│               # Zero Node.js, zero npm, zero React. Fully working mock engine.
-└── backend/    # [Upcoming in Module 2] Java 17, Spring Boot 3.x, MySQL, Spring Security JWT
+│               # Zero Node.js, zero npm, zero React. Fully working mock engine & live backend gateway.
+└── backend/    # Java 17, Spring Boot 3.x, Maven, MySQL 8, Spring Security JWT (Stateless)
 ```
 
 ---
 
-## 🌟 Module 1: Complete Frontend (Current Status: ✅ Complete)
+## 🌟 Module 1: Complete Frontend (Status: ✅ Complete)
 
 The complete frontend interface has been faithfully constructed using the **Stitch** design system and design tokens:
 - **60% Navy Background**: `#0F172A` & `#0B1326`
@@ -31,38 +31,65 @@ The complete frontend interface has been faithfully constructed using the **Stit
 - **Telemetry Colors**: Cyan (`#22D3EE`), Emerald (`#22C55E`), Amber (`#F59E0B`), Rose (`#EF4444`)
 - **Typography**: Inter (UI) & JetBrains Mono (Code)
 
-### Implemented Views & Features
-1. **Split-Screen Authentication (`pages/login.html`)**: Algorithmic viz hero on left, Sign In and Register tabs with client validation on right.
-2. **Dashboard (`pages/dashboard.html`)**: 4 stat KPI cards, Chart.js telemetry activity line chart & distribution donut chart, recent analyses table, and viva streak widget.
-3. **Projects Ecosystem (`pages/projects.html`, `pages/project-detail.html`)**: Search, language filters, sort options, project create/edit/delete modals, and tracked file registry.
-4. **Code Editor Suite (`pages/editor.html`)**: **CodeMirror 5** integration preloaded with Java Bubble Sort, 7 deep analysis tabs (Explanation, Errors & Debugging, Complexity, Code Review, Flowchart via **Mermaid.js**, Optimization, Docs), line jump highlighting, and real-time "Apply Fix" updates.
-5. **Code Compare (`pages/compare.html`)**: Dual CodeMirror side-by-side comparison, algorithm complexity matrix, and optimization verdict card.
-6. **Learning Mode & Viva Prep (`pages/learning.html`)**: Stepper walkthrough, interactive quiz with instant scoring and explanations, and college viva examination accordion.
-7. **AI Assistant (`pages/assistant.html`)**: Session drawer, prompt chips, typing indicator, and syntax-highlighted code blocks with copy buttons.
-8. **Reports & Document View (`pages/reports.html`, `pages/report-view.html`)**: Comprehensive audit records, print report functionality, and PDF tooltip.
-9. **Settings & Themes (`pages/settings.html`)**: Profile info, default explanation level, theme switcher, and password security.
-10. **Central API Gateway (`js/api.js`)**: `USE_MOCK = true` serves rich realistic Java Bubble Sort datasets with latency simulation, ready to toggle to live backend in Module 2.
-11. **API Contract Single Source of Truth (`docs/API_CONTRACT.md`)**: Full endpoint specification with request and response payloads.
+---
+
+## 🚀 Module 2: Backend Foundation & Integration (Status: ✅ Complete)
+
+A production-grade Java 17 Spring Boot 3 REST API with MySQL persistence and stateless JWT security:
+
+### Key Implemented Components:
+1. **Database Schema & JPA Entities**:
+   - `User`: BCrypt password security, unique emails, customizable theme & learning level.
+   - `Project`: Workspaces scoped strictly to the authenticated owner.
+   - `SourceFile`: Multi-file storage with `LONGTEXT` code content and quality telemetry.
+   - `Analysis`: Analysis records, quality scores, notes, and polymorphic analysis types.
+2. **Stateless Security (Spring Security 6 + JJWT 0.12.6)**:
+   - Stateless session filter (`JwtAuthenticationFilter`).
+   - CORS support for ports `5500`, `127.0.0.1:5500`, and `3000`.
+   - Strict owner-level data isolation (User A cannot access User B's resources).
+3. **Data APIs**:
+   - `/api/auth/**` (Register, Login -> JWT token + user profile).
+   - `/api/users/me` (Profile view, preferences update, password change).
+   - `/api/projects/**` & `/api/files/**` (Full project and source file CRUD).
+   - `/api/analyses` (Reusable analysis result persistence).
+   - `/api/history` (Filtered, paginated analysis history with search & notes editing).
+   - `/api/dashboard/**` (Live KPI stats & time-series activity charts).
+4. **Resilience & Seeding**:
+   - Global `@ControllerAdvice` returning standardized `{ status, error, fields }` JSON without leaking stack traces.
+   - `CommandLineRunner` automatically seeds demo student (`demo@devlens.com` / `demo123`) with sample projects and analyses.
+5. **Frontend Live Integration**:
+   - `frontend/js/api.js` updated with granular `MOCK_CONFIG` flags routing Module 2 endpoints directly to `http://localhost:8080`.
+   - Verified live login, project workspace, history audit, and dashboard workflows in browser.
+6. **Automated Test Suite**:
+   - JUnit 5 & MockMvc tests (`AuthControllerTest`, `ProjectOwnershipTest`, `HistoryFilterTest`) run against an in-memory H2 database.
 
 ---
 
-## 🚀 How to Run the Frontend
+## 🏃 Quick Start Guide
 
-1. **Via VS Code Live Server**:
-   - Right click `devlens/frontend/index.html` -> **"Open with Live Server"** (port `5500`).
-2. **Via Python Local Server**:
-   ```bash
-   cd devlens/frontend
-   python -m http.server 5500
-   ```
-   Open `http://localhost:5500/` in any browser.
+### 1. Start MySQL Server
+Ensure MySQL is running on `localhost:3306` with credentials `root` / `123456`.
+
+### 2. Run Spring Boot Backend
+```bash
+cd devlens/backend
+mvn spring-boot:run
+```
+Backend starts on **http://localhost:8080**.
+
+### 3. Run Frontend
+```bash
+cd devlens/frontend
+python -m http.server 5500
+```
+Open **http://localhost:5500/pages/login.html** in any modern web browser.  
+Log in with demo credentials: **demo@devlens.com** / **demo123**.
 
 ---
 
 ## 🎓 College Viva Explanation Guide
 
-When presenting this project in a college viva or evaluation:
-1. **Separation of Concerns**: The frontend is completely decoupled from the backend and communicates exclusively through `api.js` via a strict REST API contract (`docs/API_CONTRACT.md`).
-2. **Design Tokens (60-30-10)**: Explain how CSS variables in `tokens.css` establish mathematical color hierarchy, eliminating visual fatigue with slate surfaces and highlighting interactive nodes with electric indigo.
-3. **State Management**: Authentication state and user preferences are safely managed via `localStorage` with route guards in `auth.js` that prevent unauthorized access.
-4. **Interactive AST Visualizations**: Describe how CodeMirror line-markers coordinate with static analysis findings, allowing students to jump to bugs and apply refactors directly.
+1. **Layered Architecture**: Controller -> Service -> Repository -> Entity separation with immutable DTOs and Jakarta Validation.
+2. **Stateless Security**: Explain HMAC-SHA256 JWT tokens passed via HTTP `Authorization: Bearer <token>` headers without session state on the server.
+3. **Tenant & Data Isolation**: Highlight how all SQL queries are scoped to `@AuthenticationPrincipal UserPrincipal principal`, ensuring User B can never read or mutate User A's projects.
+4. **Global Error Handling**: Demonstrates enterprise defensive programming by catching validation exceptions and returning clean JSON payloads rather than internal server stack traces.
