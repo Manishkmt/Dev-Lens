@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - AI-Powered Code Analysis & Assistance</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <script type="module">
+    import { auth } from './js/auth.js';
+    if (auth.isAuthenticated()) {
+      window.location.replace('pages/dashboard.html');
+    } else {
+      window.location.replace('pages/login.html');
+    }
+  </script>
+</head>
+<body style="background: #0B1326; color: #F8FAFC; display: flex; align-items: center; justify-content: center; height: 100vh; font-family: sans-serif;">
+  <p>Loading DevLens...</p>
+</body>
+</html>

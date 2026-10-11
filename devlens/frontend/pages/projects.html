@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Projects & Repositories</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content-wrapper">
+      <!-- Topbar Container -->
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner">
+          <!-- Top Header -->
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-code); font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-secondary);"></span>
+                  <span>Workspace Ecosystem</span>
+                  <span>/</span>
+                  <span>Repository Registry</span>
+                </div>
+                <h1 style="font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em;">Projects</h1>
+                <p style="font-size: 13.5px; max-width: 640px; margin-top: 0.25rem;">
+                  Manage codebases and assignments analyzed by DevLens. Track architectural drift, algorithmic complexity, and real-time health telemetry across all student repositories.
+                </p>
+              </div>
+
+              <div>
+                <button class="btn btn-primary" id="open-create-modal-btn">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                  <span>Create New Project</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter & Control Bar -->
+          <div class="card" style="padding: 0.875rem 1.25rem; margin-bottom: 1.25rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.875rem;">
+            <!-- Search Input -->
+            <div class="input-with-icon" style="flex: 1; min-width: 260px;">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" class="form-input" id="project-search-input" placeholder="Search projects by title, description or language..."/>
+              <button class="input-action-btn" title="Search macro">
+                <kbd>/</kbd>
+              </button>
+            </div>
+
+            <!-- Filters -->
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.35rem; background: var(--bg-lowest); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 16px; color: var(--text-muted);">code</span>
+                <select class="form-select" id="language-filter" style="border: none; background: transparent; padding: 0.35rem 0.5rem; font-size: 12.5px;">
+                  <option value="all">All Languages</option>
+                  <option value="java">Java</option>
+                  <option value="python">Python</option>
+                  <option value="cpp">C++</option>
+                  <option value="typescript">TypeScript</option>
+                </select>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 0.35rem; background: var(--bg-lowest); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 16px; color: var(--text-muted);">sort</span>
+                <select class="form-select" id="sort-filter" style="border: none; background: transparent; padding: 0.35rem 0.5rem; font-size: 12.5px;">
+                  <option value="recent">Recently Analyzed</option>
+                  <option value="score">Quality Score</option>
+                  <option value="name">Project Title</option>
+                  <option value="files">File Magnitude</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Telemetry Mini-Metrics Bar -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="card" style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <span class="stat-label">Active Repos</span>
+                <div style="font-size: 1.25rem; font-weight: 700; margin-top: 2px;" id="metric-repo-count">6 Codebases</div>
+              </div>
+              <div style="padding: 8px; border-radius: var(--radius-md); background: var(--bg-surface-high); color: var(--color-primary-light);">
+                <span class="material-symbols-outlined" style="font-size: 20px;">inventory_2</span>
+              </div>
+            </div>
+
+            <div class="card" style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <span class="stat-label">Mean Quality</span>
+                <div style="font-size: 1.25rem; font-weight: 700; color: var(--color-emerald); margin-top: 2px;">87.8%</div>
+              </div>
+              <div style="padding: 8px; border-radius: var(--radius-md); background: var(--color-emerald-subtle); color: var(--color-emerald);">
+                <span class="material-symbols-outlined" style="font-size: 20px;">verified</span>
+              </div>
+            </div>
+
+            <div class="card" style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <span class="stat-label">Tracked Files</span>
+                <div style="font-size: 1.25rem; font-weight: 700; margin-top: 2px;">28 Units</div>
+              </div>
+              <div style="padding: 8px; border-radius: var(--radius-md); background: var(--bg-surface-high); color: var(--color-secondary);">
+                <span class="material-symbols-outlined" style="font-size: 20px;">insert_chart</span>
+              </div>
+            </div>
+
+            <div class="card" style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <span class="stat-label">Audit Pipeline</span>
+                <div style="font-size: 1.25rem; font-weight: 700; margin-top: 2px;">Continuous</div>
+              </div>
+              <div style="padding: 8px; border-radius: var(--radius-md); background: var(--bg-surface-high); color: var(--color-primary);">
+                <span class="material-symbols-outlined" style="font-size: 20px;">memory</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project Cards Grid -->
+          <div id="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+            <!-- Populated dynamically via projects.js -->
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+              Loading projects ecosystem...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Edit Project Modal -->
+  <div class="modal-backdrop" id="project-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="project-modal-title">Create New Project</h3>
+        <button class="btn btn-ghost btn-icon" id="close-project-modal-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="project-form">
+        <div class="modal-body">
+          <input type="hidden" id="edit-project-id" value="">
+
+          <div class="form-group">
+            <label class="form-label" for="proj-name">Project Title *</label>
+            <input type="text" id="proj-name" class="form-input" placeholder="e.g. CS201: Data Structures & Algorithms" required>
+            <span class="field-error" id="proj-name-error" style="color: var(--color-rose); font-size: 11.5px; display: none;"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="proj-desc">Description</label>
+            <textarea id="proj-desc" class="form-textarea" placeholder="Describe the coursework, algorithmic domains, or project goals..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="proj-lang">Primary Language</label>
+            <select id="proj-lang" class="form-select">
+              <option value="java" selected>Java 17 (LTS)</option>
+              <option value="python">Python 3.11</option>
+              <option value="cpp">C++ 20</option>
+              <option value="typescript">TypeScript</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancel-project-modal-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-project-btn">
+            <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+            <span>Save Project</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Project Confirmation Modal -->
+  <div class="modal-backdrop" id="delete-modal">
+    <div class="modal-dialog" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: var(--color-rose);">Delete Project</h3>
+        <button class="btn btn-ghost btn-icon" id="close-delete-modal-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--text-primary); font-size: 13.5px;">
+          Are you sure you want to delete <strong id="delete-project-name">this project</strong>?
+        </p>
+        <p style="color: var(--text-muted); font-size: 12px; margin-top: 0.5rem;">
+          This action cannot be undone. All indexed source files and analysis records will be permanently removed.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancel-delete-btn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+          <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+          <span>Delete Project</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/projects.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - 404 Node Not Found</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+</head>
+<body class="dark" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-canvas);">
+  <div class="card" style="max-width: 480px; width: 90%; text-align: center; padding: 3rem 2rem; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+
+    <div style="font-family: var(--font-code); font-size: 5rem; font-weight: 700; color: var(--color-rose); line-height: 1; margin-bottom: 0.5rem;">
+      404
+    </div>
+
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+      AST Node Traversal Failed
+    </h2>
+
+    <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">
+      The requested route or compilation target does not exist in the active DevLens namespace.
+    </p>
+
+    <div style="background: var(--bg-lowest); border-radius: var(--radius-md); padding: 0.75rem; font-family: var(--font-code); font-size: 11px; color: var(--text-muted); margin-bottom: 1.75rem;">
+      ERROR_CODE: ROUTE_UNDEFINED (NullPointerReference)
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: 0.75rem;">
+      <a href="dashboard.html" class="btn btn-primary">
+        <span class="material-symbols-outlined" style="font-size: 18px;">dashboard</span>
+        <span>Return to Dashboard</span>
+      </a>
+      <a href="login.html" class="btn btn-secondary">
+        <span>Go to Login</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

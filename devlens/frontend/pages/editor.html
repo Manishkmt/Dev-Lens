@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Code Editor & Deep Semantic Analysis</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+
+  <!-- CodeMirror 5 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+
+  <!-- Mermaid.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content-wrapper">
+      <!-- Topbar Container -->
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner" style="padding-top: 1rem;">
+          <!-- Top Control Dock / Toolbar -->
+          <div class="editor-top-toolbar">
+            <!-- Left: File Tabs & Telemetry Badge -->
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <!-- File Tabs Strip -->
+              <div class="file-tabs-strip" id="editor-file-tabs">
+                <button class="file-tab active" data-filename="BubbleSort.java">
+                  <span class="material-symbols-outlined" style="font-size: 15px; color: var(--color-secondary);">coffee</span>
+                  <span>BubbleSort.java</span>
+                  <span style="width: 5px; height: 5px; border-radius: 50%; background: var(--color-emerald);"></span>
+                </button>
+                <button class="file-tab" data-filename="QuickSort.java">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">code</span>
+                  <span>QuickSort.java</span>
+                </button>
+                <button class="file-tab" data-filename="BinarySearchTree.java">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">verified</span>
+                  <span>BinarySearchTree.java</span>
+                </button>
+              </div>
+
+              <!-- Engine Telemetry Badge -->
+              <div class="badge badge-neutral" style="padding: 4px 8px;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-secondary);" class="animate-pulse-glow"></span>
+                <span>Lens-LLM v2.4</span>
+                <span style="color: var(--text-muted); font-size: 9px;">• 4ms</span>
+              </div>
+            </div>
+
+            <!-- Right: Language Selector, Utility Actions, Explanation Depth, Trigger -->
+            <div style="display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap;">
+              <!-- Language Selector -->
+              <select id="editor-lang-select" class="form-select" style="width: auto; height: 32px; padding: 2px 8px; font-size: 12px; font-family: var(--font-code);">
+                <option value="java" selected>Java 17 (LTS)</option>
+                <option value="python">Python 3.11</option>
+                <option value="c">C (GCC 12)</option>
+                <option value="cpp">C++ 20</option>
+                <option value="javascript">JavaScript (ESNext)</option>
+              </select>
+
+              <!-- Quick Code Actions -->
+              <div style="display: flex; gap: 2px; background: var(--bg-surface-low); padding: 2px; border-radius: var(--radius-sm);">
+                <label class="btn btn-sm btn-ghost" title="Upload local source file" style="cursor: pointer; margin: 0;">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">file_upload</span>
+                  <span style="display: none; @media(min-width: 900px){display:inline;}">Upload</span>
+                  <input type="file" id="code-file-upload" accept=".java,.py,.cpp,.c,.js" style="display: none;">
+                </label>
+                <button class="btn btn-sm btn-ghost" id="format-code-btn" title="Auto-format Code">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">auto_fix_high</span>
+                  <span style="display: none; @media(min-width: 900px){display:inline;}">Format</span>
+                </button>
+                <button class="btn btn-sm btn-ghost" id="clear-code-btn" title="Clear Editor" style="color: var(--color-rose);">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">backspace</span>
+                </button>
+              </div>
+
+              <!-- Detail Level Pill Selector -->
+              <div style="display: flex; background: var(--bg-surface-low); padding: 2px; border-radius: var(--radius-sm);" id="level-pill-selector">
+                <button class="btn btn-sm btn-ghost level-btn" data-level="BEGINNER" style="height: 28px; padding: 0 8px; font-size: 11px;">Beginner</button>
+                <button class="btn btn-sm btn-secondary level-btn active" data-level="INTERMEDIATE" style="height: 28px; padding: 0 8px; font-size: 11px; color: var(--color-secondary);">Intermediate</button>
+                <button class="btn btn-sm btn-ghost level-btn" data-level="ADVANCED" style="height: 28px; padding: 0 8px; font-size: 11px;">Advanced</button>
+              </div>
+
+              <!-- Save Analysis Button -->
+              <button class="btn btn-sm btn-secondary" id="save-analysis-btn" title="Save Analysis to History">
+                <span class="material-symbols-outlined" style="font-size: 15px;">bookmark</span>
+                <span>Save</span>
+              </button>
+
+              <!-- Primary Analyze Action Button -->
+              <button class="btn btn-primary" id="analyze-code-btn" style="box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);">
+                <span class="material-symbols-outlined" style="font-size: 16px;">bolt</span>
+                <span>⚡ Analyze Code</span>
+                <kbd style="margin-left: 4px; font-size: 9px; padding: 0 3px;">⌘↵</kbd>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Split Canvas -->
+          <div class="editor-split-container">
+            <!-- Left Pane: CodeMirror Editor -->
+            <div class="editor-pane-left">
+              <div class="editor-pane-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #EF4444;"></span>
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #F59E0B;"></span>
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: #10B981;"></span>
+                  <span style="margin-left: 0.5rem; color: var(--text-primary); font-family: var(--font-code);" id="active-file-label">
+                    src/algorithms/BubbleSort.java
+                  </span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <span style="color: var(--color-emerald); font-size: 11.5px; display: flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span>
+                    <span>Syntactically Valid</span>
+                  </span>
+                  <button class="btn btn-sm btn-ghost" id="copy-code-btn" style="height: 24px; padding: 0 6px; font-size: 11px;">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+                    <span>Copy</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- CodeMirror Container -->
+              <div class="editor-codemirror-wrap">
+                <textarea id="codemirror-editor" style="display: none;"></textarea>
+              </div>
+
+              <!-- Status Bar Footer -->
+              <div class="editor-pane-footer">
+                <div style="display: flex; gap: 1rem;">
+                  <span id="footer-lang-label" style="color: var(--color-secondary);">Java 17</span>
+                  <span>UTF-8</span>
+                  <span>LF</span>
+                  <span>Spaces: 4</span>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                  <span id="cursor-pos-label">Ln 1, Col 1</span>
+                  <span id="line-count-label">24 lines</span>
+                  <span id="char-count-label">412 chars</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Pane: 7 Analysis Tabs Suite -->
+            <div class="analysis-pane-right">
+              <!-- Tabs Rail -->
+              <div class="analysis-tabs-rail" id="analysis-tabs-bar">
+                <button class="analysis-tab-btn active" data-tab="explanation">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">menu_book</span>
+                  <span>Explanation</span>
+                </button>
+                <button class="analysis-tab-btn" data-tab="errors">
+                  <span class="material-symbols-outlined" style="font-size: 15px; color: var(--color-rose);">troubleshoot</span>
+                  <span>Errors & Debug</span>
+                  <span class="badge badge-error" id="errors-count-badge" style="font-size: 9px; padding: 1px 5px; border-radius: 99px;">2</span>
+                </button>
+                <button class="analysis-tab-btn" data-tab="complexity">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">speed</span>
+                  <span>Complexity</span>
+                </button>
+                <button class="analysis-tab-btn" data-tab="review">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">rate_review</span>
+                  <span>Code Review</span>
+                </button>
+                <button class="analysis-tab-btn" data-tab="flowchart">
+                  <span class="material-symbols-outlined" style="font-size: 15px; color: var(--color-secondary);">account_tree</span>
+                  <span>Flowchart</span>
+                </button>
+                <button class="analysis-tab-btn" data-tab="optimization">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">psychology</span>
+                  <span>Optimization</span>
+                </button>
+                <button class="analysis-tab-btn" data-tab="docs">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">description</span>
+                  <span>Docs</span>
+                </button>
+              </div>
+
+              <!-- Loading Skeleton Indicator -->
+              <div id="analysis-loading-state" style="display: none; padding: 3rem; text-align: center;">
+                <div class="animate-spin material-symbols-outlined" style="font-size: 38px; color: var(--color-primary-light); margin-bottom: 0.75rem;">
+                  progress_activity
+                </div>
+                <h4 style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Synthesizing AST & Semantic Graph...</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Evaluating boundary conditions, loop multipliers, and invariants</p>
+              </div>
+
+              <!-- Tab 1: Explanation Panel -->
+              <div class="analysis-tab-panel active" id="tab-panel-explanation">
+                <!-- Executive Summary -->
+                <div class="card" style="position: relative; overflow: hidden;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span class="stat-label" style="color: var(--color-secondary);">Executive Summary</span>
+                    <span class="badge badge-success" id="exp-confidence">Confidence: 99.4%</span>
+                  </div>
+                  <p id="exp-summary" style="font-size: 13.5px; line-height: 1.6; color: var(--text-primary); margin-bottom: 0.75rem;">
+                    Optimized Bubble Sort implementation with early termination flag. Correctly sorts an array of integers in ascending order with O(n²) worst-case and O(n) best-case complexity.
+                  </p>
+                  <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="exp-tags-container">
+                    <span class="badge badge-ai">#ComparisonSort</span>
+                    <span class="badge badge-success">#InPlace</span>
+                    <span class="badge badge-primary">#StableSort</span>
+                    <span class="badge badge-neutral">#EarlyBreak</span>
+                  </div>
+                </div>
+
+                <!-- Method Signature Card -->
+                <div class="card">
+                  <span class="stat-label">Method Contract & Invariants</span>
+                  <div style="background: var(--bg-lowest); padding: 0.625rem 0.75rem; border-radius: var(--radius-md); font-family: var(--font-code); font-size: 12px; color: var(--color-secondary); margin: 0.5rem 0; display: flex; justify-content: space-between;">
+                    <code id="exp-signature">public static void bubbleSort(int[] arr)</code>
+                    <span style="color: var(--color-emerald); font-size: 11px;">void (in-place)</span>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                    <div style="background: var(--bg-surface-high); padding: 0.5rem; border-radius: var(--radius-sm);">
+                      <span style="font-size: 11px; color: var(--text-muted); display: block;">Precondition</span>
+                      <span style="font-size: 12px; color: var(--text-primary);">Valid non-null int[] array</span>
+                    </div>
+                    <div style="background: var(--bg-surface-high); padding: 0.5rem; border-radius: var(--radius-sm);">
+                      <span style="font-size: 11px; color: var(--text-muted); display: block;">Postcondition</span>
+                      <span style="font-size: 12px; color: var(--text-primary);">Sorted in ascending numerical order</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step by Step Walkthrough -->
+                <div class="card">
+                  <span class="stat-label">Stepwise Algorithmic Logic</span>
+                  <div id="exp-steps-list" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 2: Errors & Debugging Panel -->
+              <div class="analysis-tab-panel" id="tab-panel-errors">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-high); padding: 0.75rem 1rem; border-radius: var(--radius-md);">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span class="material-symbols-outlined" style="color: var(--color-rose);">troubleshoot</span>
+                    <span style="font-weight: 600; font-size: 13px;" id="errors-banner-title">2 Issues Detected</span>
+                  </div>
+                  <div style="display: flex; gap: 4px;">
+                    <span class="badge badge-warning">1 Warning</span>
+                    <span class="badge badge-ai">1 Info</span>
+                  </div>
+                </div>
+
+                <div id="issues-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <!-- Dynamic Issue Cards -->
+                </div>
+              </div>
+
+              <!-- Tab 3: Complexity Panel -->
+              <div class="analysis-tab-panel" id="tab-panel-complexity">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div class="card" style="text-align: center; padding: 1rem;">
+                    <span class="stat-label">Time Complexity (Worst)</span>
+                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--color-secondary); font-family: var(--font-code); margin: 0.25rem 0;" id="comp-time-worst">
+                      O(n²)
+                    </div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Best Case: <strong id="comp-time-best" style="color: var(--color-emerald);">O(n)</strong></span>
+                  </div>
+
+                  <div class="card" style="text-align: center; padding: 1rem;">
+                    <span class="stat-label">Space Complexity</span>
+                    <div style="font-size: 1.75rem; font-weight: 700; color: var(--color-emerald); font-family: var(--font-code); margin: 0.25rem 0;" id="comp-space">
+                      O(1)
+                    </div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Auxiliary In-Place Memory</span>
+                  </div>
+                </div>
+
+                <!-- Loop Multiplier Inset Card -->
+                <div class="card" id="loop-multiplier-card" style="cursor: pointer;" title="Click to highlight nested loop in editor">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.4rem; color: var(--color-primary-light); font-weight: 600; font-size: 13px;">
+                      <span class="material-symbols-outlined" style="font-size: 18px;">account_tree</span>
+                      <span>Nested Loop Multiplier Detected</span>
+                    </div>
+                    <span class="badge badge-primary">Lines 6 - 15</span>
+                  </div>
+                  <p style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    The outer loop operates at index <code class="font-mono text-primary">i &lt; n - 1</code> while the inner comparison loop spans <code class="font-mono text-secondary">j &lt; n - i - 1</code>. Coupling these nested iterations yields a quadratic polynomial growth profile of <strong style="color: var(--text-primary); font-family: var(--font-code);">½(n² - n) operations</strong>.
+                  </p>
+                </div>
+
+                <!-- Asymptotic Metrics Table -->
+                <div class="card">
+                  <span class="stat-label">Mathematical Operation Counts</span>
+                  <div class="table-container" style="border: none; margin-top: 0.5rem;">
+                    <table class="data-table">
+                      <tbody id="complexity-metrics-tbody">
+                        <tr><td>Worst-Case Comparisons</td><td style="font-family: var(--font-code); color: var(--color-secondary);">n(n-1) / 2</td></tr>
+                        <tr><td>Worst-Case Swaps</td><td style="font-family: var(--font-code); color: var(--color-rose);">n(n-1) / 2</td></tr>
+                        <tr><td>Best-Case Comparisons</td><td style="font-family: var(--font-code); color: var(--color-emerald);">n - 1</td></tr>
+                        <tr><td>Auxiliary Storage</td><td style="font-family: var(--font-code); color: var(--color-emerald);">O(1) In-Place</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 4: Code Review Panel -->
+              <div class="analysis-tab-panel" id="tab-panel-review">
+                <div class="card" style="display: flex; align-items: center; justify-content: space-between;">
+                  <div>
+                    <span class="stat-label">Overall Quality Benchmark</span>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--color-emerald); font-family: var(--font-code); line-height: 1.1;">
+                      88<span style="font-size: 14px; color: var(--text-muted); font-weight: 400;">/100</span>
+                    </div>
+                  </div>
+                  <span class="badge badge-success" style="font-size: 12px; padding: 4px 10px;">Grade A Standard</span>
+                </div>
+
+                <!-- 4 Review Pillars -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem;">
+                  <div class="card" style="padding: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                      <span>Readability</span>
+                      <strong style="color: var(--color-emerald);">92%</strong>
+                    </div>
+                    <div style="height: 4px; background: var(--bg-surface-high); border-radius: 99px;">
+                      <div style="width: 92%; height: 100%; background: var(--color-emerald);"></div>
+                    </div>
+                  </div>
+
+                  <div class="card" style="padding: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                      <span>Maintainability</span>
+                      <strong style="color: var(--color-secondary);">74%</strong>
+                    </div>
+                    <div style="height: 4px; background: var(--bg-surface-high); border-radius: 99px;">
+                      <div style="width: 74%; height: 100%; background: var(--color-secondary);"></div>
+                    </div>
+                  </div>
+
+                  <div class="card" style="padding: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                      <span>Reliability</span>
+                      <strong style="color: var(--color-amber);">68%</strong>
+                    </div>
+                    <div style="height: 4px; background: var(--bg-surface-high); border-radius: 99px;">
+                      <div style="width: 68%; height: 100%; background: var(--color-amber);"></div>
+                    </div>
+                  </div>
+
+                  <div class="card" style="padding: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                      <span>Best Practices</span>
+                      <strong style="color: var(--color-emerald);">80%</strong>
+                    </div>
+                    <div style="height: 4px; background: var(--bg-surface-high); border-radius: 99px;">
+                      <div style="width: 80%; height: 100%; background: var(--color-emerald);"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Actionable Recommendations -->
+                <div class="card">
+                  <span class="stat-label">Actionable Recommendations (3)</span>
+                  <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem;" id="review-recs-list">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 5: Flowchart Panel (Mermaid.js) -->
+              <div class="analysis-tab-panel" id="tab-panel-flowchart">
+                <div class="mermaid-viewport">
+                  <!-- Flowchart Control Tools -->
+                  <div class="flowchart-controls-bar">
+                    <button class="btn btn-sm btn-ghost btn-icon" id="flowchart-zoom-in" title="Zoom In">
+                      <span class="material-symbols-outlined" style="font-size: 16px;">zoom_in</span>
+                    </button>
+                    <button class="btn btn-sm btn-ghost btn-icon" id="flowchart-zoom-out" title="Zoom Out">
+                      <span class="material-symbols-outlined" style="font-size: 16px;">zoom_out</span>
+                    </button>
+                    <button class="btn btn-sm btn-ghost btn-icon" id="flowchart-zoom-reset" title="Reset Zoom">
+                      <span class="material-symbols-outlined" style="font-size: 16px;">restart_alt</span>
+                    </button>
+                    <div style="width: 1px; background: var(--border-color); margin: 2px;"></div>
+                    <button class="btn btn-sm btn-ghost" id="export-flowchart-svg-btn" title="Export as SVG Image" style="font-size: 11px; padding: 0 6px;">
+                      <span class="material-symbols-outlined" style="font-size: 14px;">download</span>
+                      <span>SVG</span>
+                    </button>
+                  </div>
+
+                  <!-- Mermaid Canvas Container -->
+                  <div id="mermaid-diagram-container" style="transform-origin: center center; transition: transform 0.2s ease;">
+                    <div class="mermaid" id="mermaid-raw">
+                      graph TD
+                      A([ENTRY: bubbleSort]) --> B{arr == null?}
+                      B -- Yes --> C([RETURN])
+                      B -- No --> D[int i = 0]
+                      D --> E{i < n - 1?}
+                      E -- No --> C
+                      E -- Yes --> F[swapped = false]
+                      F --> G{j < n - i - 1?}
+                      G -- Yes --> H{arr[j] > arr[j+1]?}
+                      H -- Yes --> I[Swap Elements<br/>swapped = true]
+                      H -- No --> J[j++]
+                      I --> J
+                      J --> G
+                      G -- No --> K{!swapped?}
+                      K -- Yes --> C
+                      K -- No --> L[i++]
+                      L --> E
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 6: Optimization Panel -->
+              <div class="analysis-tab-panel" id="tab-panel-optimization">
+                <div class="card">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span class="stat-label">Compiler JIT Telemetry</span>
+                    <span class="badge badge-ai" id="opt-jit-badge">JIT Friendly</span>
+                  </div>
+                  <h4 style="font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;" id="opt-title">
+                    Scalar Replacement & Inlining
+                  </h4>
+                  <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem;" id="opt-desc">
+                    Extracting the swap logic into a micro-method allows the HotSpot C2 compiler to inline and optimize registers effectively.
+                  </p>
+
+                  <div style="background: var(--bg-lowest); border-radius: var(--radius-md); padding: 0.75rem; font-family: var(--font-code); font-size: 12px; color: var(--color-primary-light); margin-bottom: 0.75rem;">
+                    <pre id="opt-code-snippet" style="margin: 0; white-space: pre-wrap;">private static void swap(int[] arr, int i, int j) {
+    int temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}</pre>
+                  </div>
+
+                  <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-high); padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); font-size: 12px;">
+                    <span style="color: var(--text-muted);">Benchmark Projection:</span>
+                    <span style="color: var(--color-emerald); font-weight: 600;">21.8% faster runtime loops</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 7: Docs Panel -->
+              <div class="analysis-tab-panel" id="tab-panel-docs">
+                <div class="card">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span class="stat-label">Auto-Generated Javadoc (Java 17)</span>
+                    <button class="btn btn-sm btn-ghost" id="copy-javadoc-btn" style="height: 24px; padding: 0 6px; font-size: 11px;">
+                      <span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+                      <span>Copy Javadoc</span>
+                    </button>
+                  </div>
+                  <pre id="docs-javadoc-container" style="background: var(--bg-lowest); padding: 0.85rem; border-radius: var(--radius-md); font-family: var(--font-code); font-size: 12px; color: var(--text-secondary); line-height: 1.6; white-space: pre-wrap; margin: 0;"></pre>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/editor.js"></script>
+</body>
+</html>

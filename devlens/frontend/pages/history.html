@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Analysis History</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <div id="sidebar-container"></div>
+    <div class="main-content-wrapper">
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-code); font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary);"></span>
+                <span>Audit Trail</span>
+                <span>/</span>
+                <span>Static & Runtime Telemetry</span>
+              </div>
+              <h1 style="font-size: 1.75rem; font-weight: 700;">Analysis History</h1>
+              <p style="font-size: 13.5px; max-width: 640px; margin-top: 0.25rem;">
+                Historical registry of AST compilations, complexity audits, and viva notes across your workspaces.
+              </p>
+            </div>
+            <a href="editor.html" class="btn btn-primary">
+              <span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
+              <span>Run New Analysis</span>
+            </a>
+          </div>
+
+          <!-- Filters Bar -->
+          <div class="card" style="padding: 0.875rem 1.25rem; margin-bottom: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between;">
+            <div class="input-with-icon" style="flex: 1; min-width: 260px;">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" id="history-search-input" class="form-input" placeholder="Search by filename, project or student notes..."/>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.35rem; background: var(--bg-lowest); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 16px; color: var(--text-muted);">filter_list</span>
+                <select id="history-type-filter" class="form-select" style="border: none; background: transparent; padding: 0.35rem 0.5rem; font-size: 12.5px;">
+                  <option value="ALL">All Analysis Types</option>
+                  <option value="ERRORS">Error Detection</option>
+                  <option value="COMPLEXITY">Complexity Audit</option>
+                  <option value="REVIEW">Code Review</option>
+                  <option value="FLOWCHART">Flowchart Gen</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- History Table Card -->
+          <div class="card">
+            <div class="table-container" style="border: none;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Module / Analysis Title</th>
+                    <th>Project</th>
+                    <th>Type</th>
+                    <th>Quality</th>
+                    <th>Student Viva Notes</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="history-tbody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">Loading audit trail...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 1rem; margin-top: 1rem; font-size: 12.5px; color: var(--text-muted);">
+              <span id="history-page-info">Showing 1 to 5 of 5 entries</span>
+              <div style="display: flex; gap: 0.35rem;" id="pagination-controls">
+                <button class="btn btn-sm btn-secondary" id="page-prev-btn" disabled>Previous</button>
+                <button class="btn btn-sm btn-primary" style="min-width: 28px; padding: 0 8px;">1</button>
+                <button class="btn btn-sm btn-secondary" id="page-next-btn" disabled>Next</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Notes Modal -->
+  <div class="modal-backdrop" id="notes-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Analysis Viva Notes</h3>
+        <button class="btn btn-ghost btn-icon" id="close-notes-modal-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="notes-form">
+        <div class="modal-body">
+          <input type="hidden" id="notes-item-id">
+          <div class="form-group">
+            <label class="form-label" for="notes-textarea">Notes & Lab Discussion Remarks</label>
+            <textarea id="notes-textarea" class="form-textarea" style="min-height: 120px;" placeholder="Add discussion points, professor feedback, or viva remarks..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancel-notes-modal-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Notes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/history.js"></script>
+</body>
+</html>

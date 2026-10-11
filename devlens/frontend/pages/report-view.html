@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Audit Report View</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <style>
+    @media print {
+      .sidebar, .topbar, .no-print { display: none !important; }
+      .main-content-wrapper { margin-left: 0 !important; width: 100% !important; }
+      body { background: #FFFFFF !important; color: #000000 !important; }
+      .card { border: 1px solid #CCC !important; background: #FFF !important; color: #000 !important; }
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <div id="sidebar-container" class="no-print"></div>
+    <div class="main-content-wrapper">
+      <div id="topbar-container" class="no-print"></div>
+
+      <div class="page-container">
+        <div class="content-inner" style="max-width: 960px;">
+          <!-- Top Nav Actions -->
+          <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <a href="reports.html" class="btn btn-sm btn-ghost">
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+              <span>Back to Reports</span>
+            </a>
+
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn btn-secondary" id="print-report-btn">
+                <span class="material-symbols-outlined" style="font-size: 16px;">print</span>
+                <span>Print Report</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Printable Document Sheet -->
+          <div class="card" style="padding: 2.5rem;">
+            <!-- Document Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                  <img src="../assets/logo.svg" alt="DevLens" style="width: 28px; height: 28px;">
+                  <span style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">DevLens Telemetry Engine</span>
+                </div>
+                <h1 style="font-size: 1.75rem; font-weight: 700; margin: 0.5rem 0 0.25rem;" id="doc-title">
+                  Quality Audit Report
+                </h1>
+                <p style="font-size: 13px; color: var(--text-secondary);" id="doc-project">
+                  Coursework: CS201 Data Structures & Algorithms
+                </p>
+              </div>
+
+              <div style="text-align: right;">
+                <div class="badge badge-success" style="font-size: 14px; padding: 6px 14px;" id="doc-score">
+                  Score: 88 / 100
+                </div>
+                <div style="font-family: var(--font-code); font-size: 11px; color: var(--text-muted); margin-top: 6px;" id="doc-date">
+                  Oct 11, 2026
+                </div>
+              </div>
+            </div>
+
+            <!-- Executive Summary -->
+            <div style="margin-bottom: 1.5rem;">
+              <span class="stat-label">Executive Summary</span>
+              <p style="font-size: 13.5px; line-height: 1.6; color: var(--text-primary); margin-top: 0.35rem;" id="doc-summary">
+                Algorithm meets criteria with optimal early termination. 2 low-severity issues flagged.
+              </p>
+            </div>
+
+            <!-- 4 Metric Pillars -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.75rem;">
+              <div style="background: var(--bg-lowest); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Readability</span>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-emerald); font-family: var(--font-code); margin-top: 2px;" id="metric-readability">92%</div>
+              </div>
+              <div style="background: var(--bg-lowest); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Maintainability</span>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-secondary); font-family: var(--font-code); margin-top: 2px;" id="metric-maintainability">74%</div>
+              </div>
+              <div style="background: var(--bg-lowest); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Reliability</span>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-amber); font-family: var(--font-code); margin-top: 2px;" id="metric-reliability">68%</div>
+              </div>
+              <div style="background: var(--bg-lowest); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; text-align: center;">
+                <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Best Practices</span>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--color-emerald); font-family: var(--font-code); margin-top: 2px;" id="metric-practices">80%</div>
+              </div>
+            </div>
+
+            <!-- Detected Issues Table -->
+            <div style="margin-bottom: 1.5rem;">
+              <span class="stat-label">Identified AST Anomalies & Warnings</span>
+              <div class="table-container" style="margin-top: 0.5rem;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Line</th>
+                      <th>Severity</th>
+                      <th>Finding Description</th>
+                    </tr>
+                  </thead>
+                  <tbody id="doc-issues-tbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Sign-off Footer -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 2rem; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+              <span>Audited by: <strong style="color: var(--text-primary);" id="doc-author">Alex Chen</strong></span>
+              <span>DevLens Academic Compliance Certified</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/report-view.js"></script>
+</body>
+</html>

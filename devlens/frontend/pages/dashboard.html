@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Developer Dashboard</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <!-- Sidebar Container (Injected by layout.js) -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content-wrapper">
+      <!-- Topbar Container (Injected by layout.js) -->
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner">
+          <!-- Top Hero Greeting Banner -->
+          <div class="dashboard-hero-banner">
+            <!-- Atmospheric Glow Backgrounds -->
+            <div style="position: absolute; -top: 80px; right: 20px; width: 340px; height: 340px; background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; filter: blur(40px);"></div>
+            <div style="position: absolute; bottom: -40px; right: 280px; width: 260px; height: 260px; background: radial-gradient(circle, rgba(34, 211, 238, 0.12) 0%, transparent 70%); border-radius: 50%; pointer-events: none; filter: blur(40px);"></div>
+
+            <div style="z-index: 2;">
+              <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem;">
+                <span class="badge badge-ai">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-secondary); box-shadow: 0 0 6px var(--color-secondary);" class="animate-pulse-glow"></span>
+                  <span>Telemetry Active</span>
+                </span>
+                <span style="font-family: var(--font-code); font-size: 11px; color: var(--text-muted);">Build 2.4.9-prod</span>
+              </div>
+              <h1 id="welcome-heading" style="font-size: 1.85rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.25rem;">
+                Welcome back, Alex 👋
+              </h1>
+              <p id="welcome-subtext" style="font-size: 13.5px; max-width: 600px;">
+                All systems normal. 6 projects indexed, 128 total analyses completed across active workspaces.
+              </p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem; z-index: 2; flex-wrap: wrap;">
+              <a href="projects.html" class="btn btn-secondary">
+                <span class="material-symbols-outlined" style="font-size: 18px;">cloud_upload</span>
+                <span>Import Repo</span>
+              </a>
+              <a href="editor.html" class="btn btn-primary" style="box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);">
+                <span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
+                <span>+ New Analysis</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 1. STAT CARDS GRID (4 Cards) -->
+          <div class="stats-grid">
+            <!-- Card 1: Total Analyses -->
+            <div class="stat-card stat-indigo">
+              <div>
+                <div class="stat-header">
+                  <span class="stat-label">Total Analyses</span>
+                  <div style="padding: 6px; background: var(--bg-surface-high); border-radius: var(--radius-md); color: var(--color-primary-light);">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">troubleshoot</span>
+                  </div>
+                </div>
+                <div class="stat-value" id="stat-total-analyses">128</div>
+              </div>
+              <div class="stat-footer">
+                <span style="color: var(--color-secondary); font-family: var(--font-code); font-size: 11.5px; display: flex; align-items: center; gap: 3px;">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+                  <span id="stat-analyses-growth">+14% this week</span>
+                </span>
+                <span style="color: var(--text-muted); font-size: 11px;">Telemetry Sync</span>
+              </div>
+            </div>
+
+            <!-- Card 2: Bugs Detected & Fixed -->
+            <div class="stat-card stat-emerald">
+              <div>
+                <div class="stat-header">
+                  <span class="stat-label">Bugs Detected & Fixed</span>
+                  <div style="padding: 6px; background: var(--bg-surface-high); border-radius: var(--radius-md); color: var(--color-emerald);">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">bug_report</span>
+                  </div>
+                </div>
+                <div class="stat-value" id="stat-bugs-fixed" style="color: var(--color-emerald);">42</div>
+              </div>
+              <div class="stat-footer">
+                <span class="badge badge-success" style="font-size: 10.5px;">
+                  <span class="material-symbols-outlined" style="font-size: 13px;">check_circle</span>
+                  <span id="stat-high-severity">8 high severity resolved</span>
+                </span>
+                <span style="color: var(--text-muted); font-size: 11px;">0 active blocks</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Avg Code Quality Score -->
+            <div class="stat-card stat-cyan">
+              <div>
+                <div class="stat-header">
+                  <span class="stat-label">Avg. Code Quality</span>
+                  <div style="padding: 6px; background: var(--bg-surface-high); border-radius: var(--radius-md); color: var(--color-secondary);">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">speed</span>
+                  </div>
+                </div>
+                <div class="stat-value" style="display: flex; align-items: baseline; gap: 4px;">
+                  <span id="stat-quality-score">88</span>
+                  <span style="font-size: 13px; color: var(--text-muted); font-weight: 400;">/100</span>
+                </div>
+              </div>
+              <div class="stat-footer">
+                <span style="color: var(--color-emerald); font-family: var(--font-code); font-size: 11.5px; display: flex; align-items: center; gap: 3px;">
+                  <span class="material-symbols-outlined" style="font-size: 15px;">verified</span>
+                  <span>Top 5% Standard</span>
+                </span>
+                <span class="badge badge-neutral" id="stat-quality-tier" style="font-size: 10px;">Grade A Tier</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Active Projects -->
+            <div class="stat-card stat-amber">
+              <div>
+                <div class="stat-header">
+                  <span class="stat-label">Active Projects</span>
+                  <div style="padding: 6px; background: var(--bg-surface-high); border-radius: var(--radius-md); color: var(--color-amber);">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">deployed_code</span>
+                  </div>
+                </div>
+                <div class="stat-value" id="stat-active-projects">9</div>
+              </div>
+              <div class="stat-footer" style="gap: 4px; flex-wrap: wrap;">
+                <span class="lang-badge java">Java</span>
+                <span class="lang-badge python">Python</span>
+                <span class="lang-badge cpp">C++</span>
+                <span class="lang-badge ts">TS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. ANALYTICS CHARTS ROW (60% Area Chart / 40% Donut Chart) -->
+          <div class="charts-row">
+            <!-- Left Chart: Analyses Over Time -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <span class="stat-label">Activity Telemetry</span>
+                  <div class="card-title" style="margin-top: 2px;">Analyses Over Time (Last 30 Days)</div>
+                </div>
+                <div style="display: flex; gap: 4px; background: var(--bg-lowest); padding: 3px; border-radius: var(--radius-sm);">
+                  <button class="btn btn-sm btn-secondary" style="height: 26px; padding: 0 8px; font-size: 11px;">Runs</button>
+                  <button class="btn btn-sm btn-ghost" style="height: 26px; padding: 0 8px; font-size: 11px;">Compute</button>
+                </div>
+              </div>
+              <div style="height: 280px; position: relative;">
+                <canvas id="analyses-activity-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Right Chart: Analysis Type Donut -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <span class="stat-label">Distribution</span>
+                  <div class="card-title" style="margin-top: 2px;">Analysis Breakdown</div>
+                </div>
+                <span class="badge badge-neutral" style="font-size: 10px;">AST Engines</span>
+              </div>
+              <div style="height: 280px; position: relative; display: flex; align-items: center; justify-content: center;">
+                <canvas id="analyses-distribution-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. RECENT ANALYSES & LEARNING PROGRESS ROW -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+            <!-- Recent Analyses Table -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Recent Code Analyses</div>
+                  <p style="font-size: 12px; margin-top: 2px;">Latest executions across projects</p>
+                </div>
+                <a href="history.html" class="btn btn-sm btn-outline">
+                  <span>View Full History</span>
+                  <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span>
+                </a>
+              </div>
+              <div class="table-container" style="border: none;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Module / File</th>
+                      <th>Project</th>
+                      <th>Lang</th>
+                      <th>Score</th>
+                      <th>Issues</th>
+                      <th>Timestamp</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-analyses-tbody">
+                    <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Loading analyses...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Quick Learning Hub & Viva Prep Widget -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div class="card-header">
+                  <div>
+                    <span class="stat-label">Student Learning Hub</span>
+                    <div class="card-title" style="margin-top: 2px;">Next Viva Topic</div>
+                  </div>
+                  <span class="badge badge-ai">Interactive</span>
+                </div>
+
+                <div style="background: var(--bg-lowest); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <span class="badge badge-primary">DSA Curriculum</span>
+                    <span style="font-family: var(--font-code); font-size: 11px; color: var(--color-emerald);">★ 4-Day Streak</span>
+                  </div>
+                  <h4 style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">
+                    Bubble Sort & Inversion Counting
+                  </h4>
+                  <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                    Master adjacent element comparison, swapped early break optimization, and stability proofs for viva examinations.
+                  </p>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 12.5px;">
+                  <div style="display: flex; justify-content: space-between; color: var(--text-secondary);">
+                    <span>Mastery Progress</span>
+                    <span style="font-family: var(--font-code); color: var(--color-secondary);">75%</span>
+                  </div>
+                  <div style="height: 6px; background: var(--bg-surface-high); border-radius: 99px; overflow: hidden;">
+                    <div style="height: 100%; width: 75%; background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 1.25rem;">
+                <a href="learning.html" class="btn btn-primary" style="width: 100%;">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">school</span>
+                  <span>Continue Learning Mode</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/dashboard.js"></script>
+</body>
+</html>

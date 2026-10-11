@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Account & Environment Settings</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <div id="sidebar-container"></div>
+    <div class="main-content-wrapper">
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner" style="max-width: 840px;">
+          <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-code); font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary-light);"></span>
+              <span>Preferences</span>
+              <span>/</span>
+              <span>Developer Profile</span>
+            </div>
+            <h1 style="font-size: 1.75rem; font-weight: 700;">Account & Environment Settings</h1>
+            <p style="font-size: 13.5px; margin-top: 0.25rem;">
+              Manage your personal student details, default AST explanation depth, theme, and security credentials.
+            </p>
+          </div>
+
+          <!-- Section 1: Profile Information -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+              <div>
+                <span class="stat-label">Identity</span>
+                <div class="card-title" style="margin-top: 2px;">Profile Information</div>
+              </div>
+              <span class="badge badge-primary">Student Pro Tier</span>
+            </div>
+
+            <form id="profile-form">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="settings-name">Full Name</label>
+                  <input type="text" id="settings-name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="settings-email">Email Address</label>
+                  <input type="email" id="settings-email" class="form-input" disabled style="opacity: 0.7; cursor: not-allowed;">
+                </div>
+              </div>
+
+              <!-- Default Explanation Level & Theme -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="settings-level">Default Explanation Level</label>
+                  <select id="settings-level" class="form-select">
+                    <option value="BEGINNER">Beginner (Foundational concepts & syntax hints)</option>
+                    <option value="INTERMEDIATE" selected>Intermediate (Standard DSA & boundary checks)</option>
+                    <option value="ADVANCED">Advanced (Bytecode, JIT inlining & cache lines)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="settings-theme">Theme Preference</label>
+                  <select id="settings-theme" class="form-select">
+                    <option value="dark" selected>Dark Mode (Navy #0F172A & Slate #1E293B)</option>
+                    <option value="light">Light Mode (#F8FAFC & Clean Contrast)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                <button type="submit" class="btn btn-primary" id="save-profile-btn">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">save</span>
+                  <span>Save Profile</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Section 2: Change Password -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <span class="stat-label">Security</span>
+                <div class="card-title" style="margin-top: 2px;">Update Password</div>
+              </div>
+              <span class="badge badge-neutral">BCrypt Hash Encrypted</span>
+            </div>
+
+            <form id="password-form">
+              <div class="form-group">
+                <label class="form-label" for="current-password">Current Password</label>
+                <input type="password" id="current-password" class="form-input" placeholder="••••••••" required>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label" for="new-password">New Password</label>
+                  <input type="password" id="new-password" class="form-input" placeholder="At least 6 characters" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="confirm-password">Confirm New Password</label>
+                  <input type="password" id="confirm-password" class="form-input" placeholder="Re-enter new password" required>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                <button type="submit" class="btn btn-secondary" id="change-password-btn">
+                  <span class="material-symbols-outlined" style="font-size: 16px;">lock_reset</span>
+                  <span>Update Password</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/settings.js"></script>
+</body>
+</html>

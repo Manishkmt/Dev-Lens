@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Project Details</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content-wrapper">
+      <!-- Topbar Container -->
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner">
+          <!-- Back Link & Header -->
+          <div style="margin-bottom: 1.5rem;">
+            <a href="projects.html" class="btn btn-sm btn-ghost" style="margin-bottom: 0.5rem; display: inline-flex; align-items: center; gap: 4px;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
+              <span>Back to Projects</span>
+            </a>
+
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                  <span class="lang-badge java" id="proj-lang-badge">JAVA</span>
+                  <span class="badge badge-success" id="proj-health-badge">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">bolt</span>
+                    <span id="proj-health-text">94 / 100</span>
+                  </span>
+                </div>
+                <h1 style="font-size: 1.75rem; font-weight: 700;" id="proj-title">Loading Project...</h1>
+                <p style="font-size: 13.5px; max-width: 680px; margin-top: 0.25rem;" id="proj-description">
+                  Please wait while project files and metrics are retrieved.
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button class="btn btn-secondary" id="open-add-file-modal-btn">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">note_add</span>
+                  <span>Add / Upload File</span>
+                </button>
+                <a href="editor.html" class="btn btn-primary" id="open-editor-btn">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">terminal</span>
+                  <span>Open in Code Editor</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Files Table Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Indexed Repository Files</div>
+                <p style="font-size: 12px; margin-top: 2px;">Tracked modules and algorithmic components</p>
+              </div>
+              <span class="badge badge-neutral" id="files-count-badge">0 Files Tracked</span>
+            </div>
+
+            <div class="table-container" style="border: none;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>File Name</th>
+                    <th>Path</th>
+                    <th>Size</th>
+                    <th>Quality</th>
+                    <th>Issues</th>
+                    <th>Last Analyzed</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="project-files-tbody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">Loading files...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add File Modal -->
+  <div class="modal-backdrop" id="file-modal">
+    <div class="modal-dialog" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Source File</h3>
+        <button class="btn btn-ghost btn-icon" id="close-file-modal-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="file-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="file-name-input">File Name *</label>
+            <input type="text" id="file-name-input" class="form-input" placeholder="e.g. MergeSort.java" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="file-path-input">Repository Path</label>
+            <input type="text" id="file-path-input" class="form-input" placeholder="e.g. src/algorithms/MergeSort.java">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="file-content-input">Source Code Content</label>
+            <textarea id="file-content-input" class="form-textarea" style="min-height: 160px; font-family: var(--font-code); font-size: 12px;" placeholder="// Paste Java code or upload file..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancel-file-modal-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+            <span>Add File</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/project-detail.js"></script>
+</body>
+</html>

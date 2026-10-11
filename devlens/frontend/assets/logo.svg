@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="lensGradient" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="innerGlow" x1="12" y1="12" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8083FF"/>
+      <stop offset="100%" stop-color="#5DE6FF"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <!-- Background Rounded Shield -->
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="#131B2E" stroke="#334155" stroke-width="1.5"/>
+  <!-- Code Brackets & Lens Loop -->
+  <path d="M16 16L10 24L16 32" stroke="url(#innerGlow)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M32 16L38 24L32 32" stroke="url(#innerGlow)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Central Focus Node / Lens Aperture -->
+  <circle cx="24" cy="24" r="7" stroke="url(#lensGradient)" stroke-width="2.5" fill="#0B1326" filter="url(#glow)"/>
+  <circle cx="24" cy="24" r="3" fill="#22D3EE"/>
+</svg>

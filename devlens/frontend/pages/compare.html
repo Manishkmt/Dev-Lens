@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Code & Algorithm Compare</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+
+  <!-- CodeMirror 5 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <div id="sidebar-container"></div>
+    <div class="main-content-wrapper">
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner">
+          <!-- Page Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-code); font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary-light);"></span>
+                <span>Differential Analysis</span>
+                <span>/</span>
+                <span>Asymptotic Benchmark</span>
+              </div>
+              <h1 style="font-size: 1.75rem; font-weight: 700;">Code Compare & Benchmarking</h1>
+              <p style="font-size: 13.5px; max-width: 640px; margin-top: 0.25rem;">
+                Evaluate performance characteristics, operation overhead, and algorithmic complexity between two implementation variants.
+              </p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap;">
+              <!-- Preset Comparison Selector -->
+              <select id="compare-presets-select" class="form-select" style="width: auto; height: 36px; font-size: 12.5px;">
+                <option value="bubble_vs_opt" selected>Unoptimized vs Optimized Bubble Sort</option>
+                <option value="bubble_vs_quick">Bubble Sort vs Quick Sort</option>
+              </select>
+
+              <button class="btn btn-primary" id="run-compare-btn" style="box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);">
+                <span class="material-symbols-outlined" style="font-size: 18px;">difference</span>
+                <span>Compare Algorithms</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dual CodeMirror Split Canvas -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <!-- Left: Variant A -->
+            <div class="editor-pane-left">
+              <div class="editor-pane-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-warning" style="font-size: 10px;">Variant A</span>
+                  <span style="color: var(--text-primary); font-family: var(--font-code); font-size: 12px;" id="variant-a-title">
+                    BubbleSortStandard.java
+                  </span>
+                </div>
+                <span style="font-size: 11px; color: var(--text-muted);">Unoptimized (No Flag)</span>
+              </div>
+              <div style="height: 340px; background: #090F1D;">
+                <textarea id="editor-variant-a" style="display: none;"></textarea>
+              </div>
+            </div>
+
+            <!-- Right: Variant B -->
+            <div class="editor-pane-left">
+              <div class="editor-pane-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span class="badge badge-success" style="font-size: 10px;">Variant B</span>
+                  <span style="color: var(--text-primary); font-family: var(--font-code); font-size: 12px;" id="variant-b-title">
+                    BubbleSortOptimized.java
+                  </span>
+                </div>
+                <span style="font-size: 11px; color: var(--color-emerald);">Adaptive Early-Exit</span>
+              </div>
+              <div style="height: 340px; background: #090F1D;">
+                <textarea id="editor-variant-b" style="display: none;"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verdict & Metric Comparison Results -->
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.25rem;">
+            <!-- Verdict Card -->
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+              <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--color-emerald);"></div>
+              <div>
+                <div class="card-header" style="margin-bottom: 0.75rem;">
+                  <span class="stat-label">AI Decision Engine</span>
+                  <span class="badge badge-success" id="verdict-winner">Variant B Winner</span>
+                </div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">
+                  Optimization Verdict
+                </h3>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;" id="verdict-summary">
+                  Variant B improves performance drastically on partially or fully sorted arrays by incorporating an adaptive boolean swap sentinel flag.
+                </p>
+              </div>
+
+              <div style="background: var(--bg-lowest); border-radius: var(--radius-md); padding: 0.85rem; margin-top: 1rem; border: 1px solid var(--border-color);">
+                <span style="font-family: var(--font-code); font-size: 11px; color: var(--color-secondary); display: block; margin-bottom: 2px;">
+                  Viva Recommendation:
+                </span>
+                <span style="font-size: 12px; color: var(--text-primary);" id="verdict-recom">
+                  Adopt Variant B for general educational benchmarks.
+                </span>
+              </div>
+            </div>
+
+            <!-- Comparison Metric Table -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <span class="stat-label">Differential Telemetry</span>
+                  <div class="card-title" style="margin-top: 2px;">Side-by-Side Complexity Matrix</div>
+                </div>
+                <span class="badge badge-neutral">Asymptotic Model</span>
+              </div>
+
+              <div class="table-container" style="border: none;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Evaluated Metric</th>
+                      <th style="color: var(--color-amber);">Variant A (Standard)</th>
+                      <th style="color: var(--color-emerald);">Variant B (Optimized)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="compare-metrics-tbody">
+                    <!-- Populated dynamically via compare.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/compare.js"></script>
+</body>
+</html>

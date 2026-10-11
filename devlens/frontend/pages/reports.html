@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevLens - Audit Reports & Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body class="dark">
+  <div class="app-layout">
+    <div id="sidebar-container"></div>
+    <div class="main-content-wrapper">
+      <div id="topbar-container"></div>
+
+      <div class="page-container">
+        <div class="content-inner">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-family: var(--font-code); font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 0.25rem;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary);"></span>
+                <span>Pedagogy & Assessment</span>
+                <span>/</span>
+                <span>Academic Audits</span>
+              </div>
+              <h1 style="font-size: 1.75rem; font-weight: 700;">Code Quality Reports</h1>
+              <p style="font-size: 13.5px; max-width: 640px; margin-top: 0.25rem;">
+                Formal assessment records, complexity benchmarks, and printable PDF reports for coursework and lab submissions.
+              </p>
+            </div>
+
+            <button class="btn btn-primary" id="open-new-report-modal-btn">
+              <span class="material-symbols-outlined" style="font-size: 18px;">post_add</span>
+              <span>Generate Audit Report</span>
+            </button>
+          </div>
+
+          <!-- Reports Grid -->
+          <div id="reports-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.25rem;">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: var(--text-muted);">
+              Loading audit reports...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Report Modal -->
+  <div class="modal-backdrop" id="report-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Generate Quality Report</h3>
+        <button class="btn btn-ghost btn-icon" id="close-report-modal-btn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form id="report-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="report-title-input">Report Title *</label>
+            <input type="text" id="report-title-input" class="form-input" placeholder="e.g. CS201 Midterm Sorting Lab Benchmark" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="report-project-select">Target Course Project</label>
+            <select id="report-project-select" class="form-select">
+              <option value="1">CS201: Data Structures & Algorithms</option>
+              <option value="2">Distributed Task Scheduler</option>
+              <option value="3">Async HTTP Gateway Microservice</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancel-report-modal-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+            <span>Generate</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="../js/pages/reports.js"></script>
+</body>
+</html>
