@@ -38,10 +38,27 @@ async function loadLearningData() {
 
 function renderConcept(concept) {
   if (!concept) return;
-  document.getElementById('concept-title').textContent = concept.title;
+  const titleEl = document.getElementById('concept-title');
+  if (titleEl) {
+    titleEl.textContent = concept.title;
+  }
   document.getElementById('concept-description').textContent = concept.description;
   document.getElementById('concept-difficulty').textContent = concept.difficulty || 'Beginner';
   document.getElementById('concept-category').textContent = concept.category || 'Algorithms';
+
+  // Add AI Disclaimer Badge
+  const headerCard = document.querySelector('.learning-hero-card') || document.getElementById('concept-title')?.parentElement;
+  if (headerCard && !document.getElementById('learning-ai-badge')) {
+    const badge = document.createElement('span');
+    badge.id = 'learning-ai-badge';
+    badge.className = 'badge badge-ai';
+    badge.style.marginTop = '4px';
+    badge.style.display = 'inline-flex';
+    badge.style.alignItems = 'center';
+    badge.style.gap = '4px';
+    badge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px;">auto_awesome</span> AI-generated, may contain mistakes`;
+    headerCard.appendChild(badge);
+  }
 }
 
 function renderStep(index) {

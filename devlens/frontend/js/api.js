@@ -28,9 +28,9 @@ export const MOCK_CONFIG = {
   history: false,       // Module 2: Live Spring Boot REST API
   analysesSave: false,  // Module 2: Live Spring Boot REST API
   analyze: false,       // Module 3: Live Code Analysis Engine!
-  ai: true,             // Module 3: AI Assistant & Viva (Mock until Module 4)
-  reports: true,        // Module 4: PDF & Reports (Mock until Module 4)
-  notifications: true   // Module 4: Notifications (Mock until Module 4)
+  ai: false,            // Module 4: Live AI Integration!
+  reports: true,        // Module 5: PDF & Reports (Mock until Module 5)
+  notifications: true   // Module 5: Notifications (Mock until Module 5)
 };
 
 // Global fallback flag for backward compatibility
@@ -383,8 +383,52 @@ export const api = {
     }
   },
 
-  // AI & Learning (Module 3)
+  // AI & Learning (Module 4)
   ai: {
+    explain: async (payload) => {
+      if (MOCK_CONFIG.ai) {
+        await delay(350);
+        return analysesMock.mockAnalyzeExplanation(payload.language, payload.code, payload.level);
+      }
+      return request('/api/ai/explain', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    },
+
+    debug: async (payload) => {
+      if (MOCK_CONFIG.ai) {
+        await delay(350);
+        return analysesMock.mockAnalyzeErrors(payload.language, payload.code, payload.level);
+      }
+      return request('/api/ai/debug', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    },
+
+    optimize: async (payload) => {
+      if (MOCK_CONFIG.ai) {
+        await delay(350);
+        return analysesMock.mockAnalyzeOptimization(payload.language, payload.code, payload.level);
+      }
+      return request('/api/ai/optimize', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    },
+
+    docs: async (payload) => {
+      if (MOCK_CONFIG.ai) {
+        await delay(350);
+        return analysesMock.mockAnalyzeDocs(payload.language, payload.code, payload.level);
+      }
+      return request('/api/ai/docs', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+    },
+
     chat: async (payload) => {
       if (MOCK_CONFIG.ai) {
         await delay(450);

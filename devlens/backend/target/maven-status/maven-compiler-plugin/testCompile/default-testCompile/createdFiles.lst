@@ -1,3 +1,8 @@
 com\devlens\auth\AuthControllerTest.class
+com\devlens\analysis\CodeAnalysisEngineTest.class
 com\devlens\history\HistoryFilterTest.class
+com\devlens\ai\PromptTemplatesTest.class
 com\devlens\project\ProjectOwnershipTest.class
+com\devlens\ai\MockAIServiceTest.class
+com\devlens\ai\AiJsonParserTest.class
+com\devlens\ai\AiControllerTest.class

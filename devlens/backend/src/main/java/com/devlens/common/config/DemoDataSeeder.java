@@ -30,6 +30,8 @@ public class DemoDataSeeder implements CommandLineRunner {
     private final ProjectRepository projectRepository;
     private final SourceFileRepository sourceFileRepository;
     private final AnalysisRepository analysisRepository;
+    private final com.devlens.ai.repository.ChatSessionRepository chatSessionRepository;
+    private final com.devlens.ai.repository.ChatMessageRepository chatMessageRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -199,6 +201,61 @@ public class DemoDataSeeder implements CommandLineRunner {
                 .resultJson("{\"qualityScore\":86,\"issuesCount\":1,\"summary\":\"Reliable queue consumer loop properly re-asserts thread interruption.\"}")
                 .build();
         analysisRepository.save(analysis3);
+
+        // 6. Seed Demo AI Chat Sessions & Messages
+        com.devlens.ai.entity.ChatSession chatSession1 = com.devlens.ai.entity.ChatSession.builder()
+                .id("session-101")
+                .title("BubbleSort Inversion & Optimization")
+                .user(demoUser)
+                .createdAt(LocalDateTime.now().minusHours(2))
+                .updatedAt(LocalDateTime.now().minusHours(1))
+                .build();
+        chatSessionRepository.save(chatSession1);
+
+        com.devlens.ai.entity.ChatMessage msg1 = com.devlens.ai.entity.ChatMessage.builder()
+                .id("msg-1")
+                .session(chatSession1)
+                .sender("user")
+                .text("Why does line 9 need a temporary variable during swap in Java?")
+                .timestamp(LocalDateTime.now().minusMinutes(50))
+                .build();
+        chatMessageRepository.save(msg1);
+
+        com.devlens.ai.entity.ChatMessage msg2 = com.devlens.ai.entity.ChatMessage.builder()
+                .id("msg-2")
+                .session(chatSession1)
+                .sender("ai")
+                .text("In Java, primitive assignments evaluate immediately. If you execute `arr[j] = arr[j+1]` directly, the original value in `arr[j]` is overwritten before it can be assigned to `arr[j+1]`.\n\nA buffer variable holds the value safely:\n```java\nint temp = arr[j];      // Preserve original value\narr[j] = arr[j + 1];   // Overwrite with next element\narr[j + 1] = temp;     // Place preserved value\n```\n\nIn Java 17 primitive arrays, this three-step exchange is canonical.")
+                .timestamp(LocalDateTime.now().minusMinutes(49))
+                .build();
+        chatMessageRepository.save(msg2);
+
+        com.devlens.ai.entity.ChatSession chatSession2 = com.devlens.ai.entity.ChatSession.builder()
+                .id("session-102")
+                .title("Java 17 Pattern Matching & Sealed Classes")
+                .user(demoUser)
+                .createdAt(LocalDateTime.now().minusDays(1))
+                .updatedAt(LocalDateTime.now().minusDays(1))
+                .build();
+        chatSessionRepository.save(chatSession2);
+
+        com.devlens.ai.entity.ChatMessage msg3 = com.devlens.ai.entity.ChatMessage.builder()
+                .id("msg-3")
+                .session(chatSession2)
+                .sender("user")
+                .text("Can I use pattern matching for instanceof in Java 17?")
+                .timestamp(LocalDateTime.now().minusDays(1))
+                .build();
+        chatMessageRepository.save(msg3);
+
+        com.devlens.ai.entity.ChatMessage msg4 = com.devlens.ai.entity.ChatMessage.builder()
+                .id("msg-4")
+                .session(chatSession2)
+                .sender("ai")
+                .text("Yes! Java 17 finalised Pattern Matching for `instanceof` (JEP 394). You no longer need manual casting:\n\n```java\nif (obj instanceof String s) {\n    System.out.println(\"String length: \" + s.length());\n}\n```")
+                .timestamp(LocalDateTime.now().minusDays(1))
+                .build();
+        chatMessageRepository.save(msg4);
 
         log.info("Demo data seeding complete! Demo credentials: demo@devlens.com / demo123");
     }

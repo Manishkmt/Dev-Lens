@@ -227,7 +227,13 @@ async function sendMessage() {
       <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--bg-surface-high); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
         <span class="material-symbols-outlined" style="font-size: 16px; color: var(--color-secondary);">smart_toy</span>
       </div>
-      <div class="chat-message-content">${formatChatMessageText(res.reply)}</div>
+      <div class="chat-message-content">
+        ${formatChatMessageText(res.reply)}
+        <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 3px;">
+          <span class="material-symbols-outlined" style="font-size: 12px; color: var(--color-secondary);">auto_awesome</span>
+          <span>AI-generated, may contain mistakes</span>
+        </div>
+      </div>
     `;
     stream.appendChild(aiMsgEl);
 

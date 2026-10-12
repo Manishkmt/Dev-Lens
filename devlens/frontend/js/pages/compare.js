@@ -178,6 +178,19 @@ function renderVerdict(verdict) {
   document.getElementById('verdict-winner').textContent = verdict.winner;
   document.getElementById('verdict-summary').textContent = verdict.summary;
   document.getElementById('verdict-recom').textContent = verdict.recommendation;
+
+  const verdictCard = document.getElementById('verdict-winner')?.closest('.card') || document.getElementById('verdict-winner')?.parentElement;
+  if (verdictCard && !document.getElementById('compare-ai-badge')) {
+    const badge = document.createElement('div');
+    badge.id = 'compare-ai-badge';
+    badge.className = 'badge badge-ai';
+    badge.style.marginTop = '8px';
+    badge.style.display = 'inline-flex';
+    badge.style.alignItems = 'center';
+    badge.style.gap = '4px';
+    badge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 11px;">auto_awesome</span> AI-generated, may contain mistakes`;
+    verdictCard.appendChild(badge);
+  }
 }
 
 function renderMetrics(metrics) {
